@@ -1,0 +1,93 @@
+Sub AgruparPatrimonioPorFamilia()
+    Dim ws As Worksheet, wsDestino As Worksheet, ultimaLinha As Long, i As Long, data As Date, familia As String, patrimonio As Double, patrimonioOff As Double, dictPatrimonio As Object, dictPatrimonioOff As Object
+    Dim titleColor As Long, borderColor As Long, rangeQuadro As Range
+
+    Set ws = ThisWorkbook.Sheets("Base_Dados")
+    Set wsDestino = ThisWorkbook.Sheets("Botao_2")
+    titleColor = RGB(255, 192, 0)
+    borderColor = RGB(0, 0, 0)
+    ultimaLinha = ws.Cells(ws.Rows.Count, "C").End(xlUp).Row
+    Set dictPatrimonio = CreateObject("Scripting.Dictionary")
+    Set dictPatrimonioOff = CreateObject("Scripting.Dictionary")
+
+    For i = 9 To ultimaLinha
+        data = ws.Cells(i, "B").Value
+        familia = ws.Cells(i, "C").Value
+        patrimonio = ws.Cells(i, "E").Value
+        patrimonioOff = ws.Cells(i, "I").Value
+        If dictPatrimonio.Exists(familia & "_" & Month(data) & "_" & Year(data)) Then
+            dictPatrimonio(familia & "_" & Month(data) & "_" & Year(data)) = dictPatrimonio(familia & "_" & Month(data) & "_" & Year(data)) + patrimonio
+        Else
+            dictPatrimonio(familia & "_" & Month(data) & "_" & Year(data)) = patrimonio
+        End If
+        If dictPatrimonioOff.Exists(familia & "_" & Month(data) & "_" & Year(data)) Then
+            dictPatrimonioOff(familia & "_" & Month(data) & "_" & Year(data)) = dictPatrimonioOff(familia & "_" & Month(data) & "_" & Year(data)) + patrimonioOff
+        Else
+            dictPatrimonioOff(familia & "_" & Month(data) & "_" & Year(data)) = patrimonioOff
+        End If
+    Next i
+
+    wsDestino.Cells(5, "E").CurrentRegion.ClearContents
+    wsDestino.Cells(5, "E").Value = "Data"
+    wsDestino.Cells(5, "F").Value = "Família"
+    wsDestino.Cells(5, "G").Value = "PL ON(R$)"
+    wsDestino.Cells(5, "H").Value = "Evolução PL(On)"
+    wsDestino.Cells(5, "I").Value = "PL OFF (R$)"
+    wsDestino.Cells(5, "J").Value = "Evolução PL(Off)"
+
+    With wsDestino.Range("E5:J5").Interior
+        .Pattern = xlSolid
+        .Color = titleColor
+    End With
+
+    i = 6
+    For Each chave In dictPatrimonio.Keys
+        Dim partes As Variant
+        partes = Split(chave, "_")
+        wsDestino.Cells(i, "E").Value = DateSerial(partes(2), partes(1), 1)
+        wsDestino.Cells(i, "F").Value = partes(0)
+        wsDestino.Cells(i, "G").Value = Format(dictPatrimonio(chave), "0.00")
+        wsDestino.Cells(i, "I").Value = Format(dictPatrimonioOff(chave), "0.00")
+        i = i + 1
+    Next chave
+
+    wsDestino.Columns("E:E").NumberFormat = "mm/yyyy"
+
+    Set rangeQuadro = wsDestino.Cells(5, "E").CurrentRegion
+    With rangeQuadro
+        .HorizontalAlignment = xlCenter
+        .Borders.LineStyle = xlContinuous
+        .Borders.Color = borderColor
+        .Borders.Weight = xlThin
+    End With
+
+For i = 7 To wsDestino.Cells(wsDestino.Rows.Count, "E").End(xlUp).Row
+
+    If IsNumeric(wsDestino.Cells(i, "G").Value) And IsNumeric(wsDestino.Cells(i - 2, "G").Value) Then
+        wsDestino.Cells(i, "H").Value = wsDestino.Cells(i, "G").Value - wsDestino.Cells(i - 2, "G").Value
+    Else
+        wsDestino.Cells(i, "H").Value = 0
+    End If
+
+    If IsNumeric(wsDestino.Cells(i, "I").Value) And IsNumeric(wsDestino.Cells(i - 2, "I").Value) Then
+        wsDestino.Cells(i, "J").Value = wsDestino.Cells(i, "I").Value - wsDestino.Cells(i - 2, "I").Value
+    Else
+        wsDestino.Cells(i, "J").Value = 0
+    End If
+
+
+    If wsDestino.Cells(i, "H").Value < 0 Then
+        wsDestino.Cells(i, "H").Font.Color = RGB(255, 0, 0)
+    Else
+        wsDestino.Cells(i, "H").Font.Color = RGB(0, 128, 0)
+    End If
+
+    
+    If wsDestino.Cells(i, "J").Value < 0 Then
+        wsDestino.Cells(i, "J").Font.Color = RGB(255, 0, 0)
+    Else
+        wsDestino.Cells(i, "J").Font.Color = RGB(0, 128, 0)
+    End If
+Next i
+
+End Sub
