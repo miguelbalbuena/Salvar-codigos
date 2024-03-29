@@ -1,0 +1,26 @@
+Sub AdicionarSubtotal()
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    
+    ' Definir a planilha ativa (Utilizar na planilha Base_Dados)
+    Set ws = ThisWorkbook.ActiveSheet
+    
+    ' Encontrar a última linha com dados na coluna E
+    lastRow = ws.Cells(ws.Rows.Count, "E").End(xlUp).Row
+    
+    ' Inserir subtotal na linha especificada
+    ws.Cells(lastRow + 1, "E").Formula = "=SUBTOTAL(9,E2:E" & lastRow & ")"
+    ws.Cells(lastRow + 1, "F").Formula = "=SUBTOTAL(9,F2:F" & lastRow & ")"
+    ws.Cells(lastRow + 1, "G").Formula = "=SUBTOTAL(9,G2:G" & lastRow & ")"
+    ws.Cells(lastRow + 1, "H").Formula = "=SUBTOTAL(9,H2:H" & lastRow & ")"
+    ws.Cells(lastRow + 1, "I").Formula = "=SUBTOTAL(9,I2:I" & lastRow & ")"
+    ws.Cells(lastRow + 1, "J").Formula = "=SUBTOTAL(9,J2:J" & lastRow & ")"
+    ws.Cells(lastRow + 1, "K").Formula = "=SUBTOTAL(9,K2:K" & lastRow & ")"
+    ws.Cells(lastRow + 1, "L").Formula = "=SUBTOTAL(9,L2:L" & lastRow & ")"
+
+    ' Congela a oitava linha da planilha ativa
+    ActiveWindow.FreezePanes = False ' Certifica-se de que nenhuma linha esteja congelada inicialmente
+    Rows("9:9").Select ' Seleciona a oitava linha para congelar
+    ActiveWindow.FreezePanes = True ' Congela a oitava linha
+    
+End Sub
