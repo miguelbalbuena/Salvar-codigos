@@ -1,0 +1,35 @@
+Sub CriarTabelaEstrategias()
+
+    Dim wsBase As Worksheet
+    Dim wsBotao As Worksheet
+    Dim rngNomesBase As Range
+    Dim cell As Range
+    Dim nome As String
+    Dim linha As Long
+    Dim primeiraLinha As Boolean
+    
+    
+    Set wsBase = ThisWorkbook.Sheets("Base_Dados")
+    Set wsBotao = ThisWorkbook.Sheets("Botao_3")
+    Set rngNomesBase = wsBase.Range("D2:D" & wsBase.Cells(wsBase.Rows.Count, "D").End(xlUp).Row)
+    linha = wsBotao.Cells(wsBotao.Rows.Count, "E").End(xlUp).Row + 1
+    primeiraLinha = True
+    
+    For Each cell In rngNomesBase
+        nome = cell.Value
+
+        If WorksheetFunction.CountIf(wsBotao.Range("E:E"), nome) = 0 Then
+            wsBotao.Cells(linha, "E").Value = nome
+            wsBotao.Range(wsBotao.Cells(linha, "E"), wsBotao.Cells(linha, "F")).Borders.LineStyle = xlContinuous
+            
+            If primeiraLinha Then
+                wsBotao.Cells(linha, "F").Value = "Estratégias de alocação"
+                wsBotao.Cells(linha, "E").Resize(1, 2).Interior.Color = RGB(255, 255, 0)
+                primeiraLinha = False
+            End If
+            
+            linha = linha + 1
+        End If
+    Next cell
+
+End Sub
